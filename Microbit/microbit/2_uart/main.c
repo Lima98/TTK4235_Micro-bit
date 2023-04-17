@@ -1,6 +1,7 @@
 #include "uart.h"
 #include "gpio.h"
 #include <stdint.h>
+#include <stdio.h>
 
 #define GPIO0 ((NRF_GPIO_REGS0*)0x50000000) //gpio 0 base adress
 #define GPIO1 ((NRF_GPIO_REGS1*)0x50000300) //gpio 1 base adress
@@ -20,6 +21,15 @@ void toggle_matrix(){
 		}
     }
 
+ssize_t _write(int fd, const void *buf, size_t count){
+	char * letter = (char *)(buf);
+	for(int i = 0; i < count; i++){
+		uart_send(*letter);
+		letter++;
+	}
+	return count;
+}
+
 int main(){
 	uart_init();
 	gpio_init();
@@ -28,16 +38,16 @@ int main(){
 	int sleep = 0;
 	while(1){
 		/* Check if button B is pressed;
-		 * turn on LED matrix if it is. */
+		 * toggle the LED matrix. */
 		if( !(GPIO0->IN & (1 << BTN_PIN_B)) ){
             uart_send('B');
             toggle_matrix();
 		}
 
 		/* Check if button A is pressed;
-		 * turn off LED matrix if it is. */
+		 * toggle LED matrix. */
 		if( !(GPIO0->IN & (1 << BTN_PIN_A)) ){
-			uart_send('A');
+			uart_send('a');
             toggle_matrix();
 		}
 
