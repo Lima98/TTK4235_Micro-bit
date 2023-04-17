@@ -51,26 +51,58 @@ void uart_init(){
 
     UART->PSEL_RTS =~ 0;
     UART->PSEL_CTS =~ 0;
-    UART->PSEL_RXD = 6;
-    UART->PSEL_TXD = 8;
-    UART->BAUDRATE = 0x2580; // 9600
+    UART->PSEL_RXD = 0x28; //6
+    UART->PSEL_TXD = 0x06;
+    UART->BAUDRATE = 0x00275000; // 9600
     UART->ENABLE = 4;
     UART->TASKS_STARTRX = 1;
+
 }
 
 void uart_send(char letter){
+    /*
     UART->TASKS_STARTTX = 1;
     UART->TXD = letter;
     while (!(UART->EVENTS_TXDRDY));
     UART->EVENTS_TXDRDY = 0;
     UART->TASKS_STOPTX = 1;
+    */
+
+    UART->TASKS_STARTTX= 1;
+    UART->TXD = letter;
+    
+    while(UART->EVENTS_TXDRDY != 1){
+        //wait
+    }
+    UART->EVENTS_TXDRDY = 0;
+    UART->TASKS_STOPTX = 1;
 }
 
 char uart_read(){
+ /*
+    UART->TASKS_STARTRX = 1;
     if (UART->EVENTS_RXDRDY){
     UART->EVENTS_RXDRDY = 0;
     return UART->RXD;
     }
     return '\0';
+*/
+    UART->TASKS_STARTRX = 1;
+    if(UART->EVENTS_RXDRDY != 1){
+        return '\0';
+    }
+    UART->EVENTS_RXDRDY = 0;
+    char letter = UART->RXD;
+    return letter;
 }
 
+void uart_send_str(char ** str){
+    UART->TASKS_STARTTX = 1;
+    char * letter_ptr = *str;
+    while(*letter_ptr != 0){
+        UART->TXD = *letter_ptr;
+        while(!UART->EVENTS_TXDRDY);
+        UART->EVENTS_TXDRDY = 0;
+        letter_ptr++;
+    }
+}

@@ -1,10 +1,10 @@
 #include <stdint.h>
 
-#define GPIO0 ((NRF_GPIO_REGS0*)__GPIO_BASE_ADDRESS__) //gpio 0 base adress
-#define GPIO1 ((NRF_GPIO_REGS1*)__GPIO_BASE_ADDRESS__) //gpio 1 base adress
+#define GPIO0 ((NRF_GPIO_REGS0*)0x50000000) //gpio 0 base adress
+#define GPIO1 ((NRF_GPIO_REGS1*)0x50000300) //gpio 1 base adress
 
-#define BTN_PIN_A 14;
-#define BTN_PIN_B 23;
+int BTN_PIN_A = 14;
+int BTN_PIN_B = 23;
 
 typedef struct {
 	volatile uint32_t RESERVED0[321];
@@ -60,34 +60,22 @@ int main(){
 
 		/* Check if button B is pressed;
 		 * turn on LED matrix if it is. */
-		if( !((1 << BTN_PIN_B) & GPIO0->IN) ){
+		if( !(GPIO0->IN & (1 << BTN_PIN_B)) ){
 				GPIO0->OUTSET = (1 << 21);
 				GPIO0->OUTSET = (1 << 22);
 				GPIO0->OUTSET = (1 << 15);
 				GPIO0->OUTSET = (1 << 24);
 				GPIO0->OUTSET = (1 << 19);
-
-				GPIO0->OUTSET = (1 << 28);
-				GPIO0->OUTSET = (1 << 11);
-				GPIO0->OUTSET = (1 << 31);
-				GPIO1->OUTSET = (1 << 5);
-				GPIO0->OUTSET = (1 << 30);
 		}
 
 		/* Check if button A is pressed;
 		 * turn off LED matrix if it is. */
-		if( !((1 << BTN_PIN_A) & GPIO0->IN) ){
+		if( !(GPIO0->IN & (1 << BTN_PIN_A)) ){
 				GPIO0->OUTCLR = (1 << 21);
 				GPIO0->OUTCLR = (1 << 22);
 				GPIO0->OUTCLR = (1 << 15);
 				GPIO0->OUTCLR = (1 << 24);
 				GPIO0->OUTCLR = (1 << 19);
-
-				GPIO0->OUTCLR = (1 << 28);
-				GPIO0->OUTCLR = (1 << 11);
-				GPIO0->OUTCLR = (1 << 31);
-				GPIO1->OUTCLR = (1 << 5);
-				GPIO0->OUTCLR = (1 << 30);
 		}
 
 		sleep = 10000;
