@@ -23,7 +23,6 @@ void toggle_matrix(){
 int main(){
 	uart_init();
 	gpio_init();
-
     matrix_status = 0;
 
 	int sleep = 0;
